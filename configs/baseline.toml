@@ -1,0 +1,14 @@
+[experiment]
+name = "baseline"
+seed = 42
+
+[workload]
+name = "placeholder"
+batch_size = 1
+
+[hardware]
+memory_type = "dram"
+near_memory_enabled = true
+
+[output]
+directory = "outputs"
