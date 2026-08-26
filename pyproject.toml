@@ -12,13 +12,18 @@ authors = [{ name = "Snow" }]
 dependencies = []
 
 [project.optional-dependencies]
+cpu = [
+  "numpy>=1.26,<3",
+]
 dev = [
+  "numpy>=1.26,<3",
   "pytest>=8.0",
   "ruff>=0.6",
 ]
 
 [project.scripts]
 pnm = "pnm.cli:main"
+pnm-cpu-benchmark = "pnm.benchmarks.cpu:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

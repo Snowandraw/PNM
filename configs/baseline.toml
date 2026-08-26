@@ -1,14 +1,14 @@
-[experiment]
+[experiment] # 实验元信息
 name = "baseline"
 seed = 42
 
-[workload]
+[workload] # 负载参数
 name = "placeholder"
 batch_size = 1
 
-[hardware]
+[hardware] # 硬件信息
 memory_type = "dram"
 near_memory_enabled = true
 
-[output]
+[output] # 输出路径
 directory = "outputs"

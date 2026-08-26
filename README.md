@@ -2,10 +2,10 @@
 ## 2026/8/17
 PNM（Processing Near Memory）研究工程的可复现实验骨架。这里存放工作负载、近存计算模型、实验配置及其可追溯的结果说明，具体算法和硬件实现可在此基础上逐步加入。
 ### 环境搭建 & 基础功能验证
-项目使用 Python 3.14.6 版本，配置文件采用标准库支持的 TOML 格式。
-```powershell
-& "$HOME\.local\bin\python3.14.exe" -m venv .venv
-.\.venv\Scripts\Activate.ps1
+项目要求 Python 3.11 或更高版本。当前 WSL 环境使用项目根目录中的 .venv（Python 3.12.12），配置文件采用标准库支持的 TOML 格式。
+```bash
+source .venv/bin/activate
+python --version
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 pnm --config configs/baseline.toml
@@ -31,7 +31,7 @@ pytest
 4. 在 `experiments/` 新建说明，记录配置路径、Git commit、数据版本、关键指标和结论。
 `pnm` 当前会验证并打印实验配置，作为后续 benchmark、simulator 或训练流程的稳定入口。
 ### 开发检查
-```powershell
+```bash
 ruff check . 
 pytest
 ```

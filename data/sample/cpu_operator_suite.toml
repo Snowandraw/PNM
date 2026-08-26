@@ -1,0 +1,26 @@
+[dataset]
+schema_version = 1
+name = "cpu-operator-suite-v1"
+seed = 20260825
+dtype = "float32"
+generator = "numpy.random.Generator(PCG64)"
+
+[vector]
+# Approximate cache tiers for a Ryzen 7 7840H. Real cache residency also depends on
+# the operator, other processes, prefetching, and the active CPU affinity.
+sizes = [2048, 65536, 1048576, 8388608]
+
+[matrix]
+# Square FP32 matrices. GEMM is a CPU/NPU/GPU comparison point, not a BF3 target.
+sizes = [256, 1024, 2048]
+
+[records]
+# records-v1 is exactly 16 bytes:
+# flow_id:u32, timestamp:u32, length:u16, flags:u16, value:f32.
+counts = [262144, 1048576, 4194304]
+histogram_bins = 65536
+filter_threshold = 0.0
+
+[payload]
+# High-entropy bytes used by the checksum path.
+sizes = [8192, 524288, 8388608]
