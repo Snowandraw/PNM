@@ -6,8 +6,8 @@ dtype = "float32"
 generator = "numpy.random.Generator(PCG64)"
 
 [vector]
-# Approximate cache tiers for a Ryzen 7 7840H. Real cache residency also depends on
-# the operator, other processes, prefetching, and the active CPU affinity.
+# Working sets span small-cache through last-level-cache/DRAM-sized cases. Actual
+# residency depends on the operator, platform, prefetching, and CPU affinity.
 sizes = [2048, 65536, 1048576, 8388608]
 
 [matrix]

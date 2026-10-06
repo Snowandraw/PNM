@@ -9,6 +9,8 @@ pytest.importorskip("numpy")
 
 from pnm.benchmarks.cpu import load_benchmark_settings, run_benchmark
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+
 
 def test_cpu_benchmark_writes_reproducible_artifacts(tmp_path: Path) -> None:
     dataset_path = tmp_path / "dataset.toml"
@@ -88,6 +90,8 @@ operators = [
     assert len(metrics["metrics"]) == 12
     assert {row["correctness_status"] for row in metrics["metrics"]} == {"passed"}
     assert manifest["experiment"]["near_memory_enabled"] is False
+    assert manifest["execution"]["requested_cpu_affinity"] is None
+    assert manifest["runtime"]["cpu_model"]
     assert (result_directory / "summary.csv").is_file()
     assert (result_directory / "config.toml").is_file()
     assert (result_directory / "dataset.toml").is_file()
@@ -125,3 +129,13 @@ operators = ["not-an-operator"]
 
     with pytest.raises(ValueError, match="Unsupported CPU operators"):
         load_benchmark_settings(config_path)
+
+
+def test_server_pcore_configuration_loads_execution_controls() -> None:
+    settings = load_benchmark_settings(REPOSITORY_ROOT / "configs/cpu_server_285k_pcore.toml")
+
+    assert settings.experiment.name == "cpu-baseline-core-ultra-9-285k-pcore-single"
+    assert settings.execution_profile == "pcore-single-cpu2"
+    assert settings.cpu_affinity == (2,)
+    assert settings.thread_count == 1
+    assert len(settings.operators) == 12

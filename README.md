@@ -4,6 +4,8 @@ PNM（Processing Near Memory）研究工程的可复现实验骨架。仓库用�
 CPU 基线、近存计算模型、实验配置和可追溯的结果说明。当前阶段不依赖 DPU，先建立
 稳定的 CPU、内存和存储 I/O 基线，再逐步接入模拟或真实卸载后端。
 
+项目版本的主要变化与验证记录见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 环境要求
 
 项目要求 Python 3.11 或更高版本。服务器参考环境为 Ubuntu 24.04、Python 3.12，
@@ -41,7 +43,7 @@ source ~/.venvs/pnm-server/bin/activate
 python --version
 which python
 pnm --config configs/baseline.toml
-pytest
+pytest  
 ruff check .
 ```
 
@@ -50,20 +52,23 @@ ruff check .
 
 ## CPU 算子基线
 
-NumPy CPU 算子基线入口为：
+服务器提供 P-core 和 E-core 两个单核配置。配置会在 NumPy 导入前自动固定 CPU
+亲和性，并把 OpenBLAS、OpenMP、MKL、BLIS 和 NumExpr 的线程数设为 1；<!-- 数值计算库、共享内存并行编程标准、英特尔的高性能数值库、矩阵和向量计算库、Python 数值表达式计算库 -->
 
 ```bash
-pnm-cpu-benchmark --config configs/cpu_baseline.toml
+pnm-cpu-benchmark --config configs/cpu_server_285k_pcore.toml
+pnm-cpu-benchmark --config configs/cpu_server_285k_ecore.toml
 ```
 
-`configs/cpu_baseline.toml` 目前保留原 WSL/7840H 基线参数。正式测量服务器前，
-应复制一份服务器专属配置，更新实验名、硬件信息、线程设置和输出目录，避免混淆不同平台的数据。
+结果写入 `outputs/server-285k/<实验名>/<UTC 时间>-<配置哈希>/`。其中包含原始采样、
+汇总 CSV、配置快照、数据集快照、Git 状态、实际 CPU 亲和性、数学库线程环境和 CPU
+电源策略。`configs/cpu_baseline.toml` 继续保留原 WSL/7840H 参数，只用于历史结果追溯。
 
-为了得到可比较的单线程结果，运行前可显式限制数学库线程数：
+当前服务器映射为 CPU 0–7 是 P-core，CPU 8–23 是 E-core；正式运行前仍应确认机器负载较低：
 
 ```bash
-export OPENBLAS_NUM_THREADS=1
-export OMP_NUM_THREADS=1
+uptime
+lscpu -e=CPU,CORE,MAXMHZ
 ```
 
 ## 目录约定

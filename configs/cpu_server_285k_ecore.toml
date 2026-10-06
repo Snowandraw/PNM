@@ -1,0 +1,43 @@
+[experiment]
+name = "cpu-baseline-core-ultra-9-285k-ecore-single"
+seed = 20260825
+
+[workload]
+name = "cpu-operator-suite-v1"
+batch_size = 1
+
+[hardware]
+platform = "bare-metal-linux"
+cpu_model = "Intel Core Ultra 9 285K"
+cpu_class = "E-core"
+numa_node = 0 # 实验使用哪个 NUMA 节点
+memory_type = "system-dram-256GiB-speed-unrecorded"
+near_memory_enabled = false
+
+[execution] # 用来控制在哪个 CPU 核心上跑，以及数学库用几个线程
+profile = "ecore-single-cpu8"
+cpu_affinity = [8]
+thread_count = 1
+
+[output]
+directory = "outputs/server-285k"
+
+[cpu_benchmark]
+dataset = "data/sample/cpu_operator_suite.toml"
+warmup_iterations = 5
+measured_iterations = 15
+target_sample_ms = 50
+operators = [
+  "copy",
+  "add",
+  "multiply",
+  "relu",
+  "sum",
+  "gather",
+  "transpose_copy",
+  "threshold_count",
+  "filter_compact",
+  "histogram",
+  "crc32",
+  "matmul",
+]
