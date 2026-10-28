@@ -28,7 +28,7 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 from pnm.config import ExperimentConfig, load_experiment_config
 
@@ -58,6 +58,21 @@ THREAD_ENVIRONMENT_VARIABLES = (  # 环境变量专门用来控制底层数值�
     "BLIS_NUM_THREADS",  # 高性能 BLAS 库，部分 ARM/AMD 平台 numpy 会选用
     "NUMEXPR_NUM_THREADS",  # numpy 加速库，用于数组运算多线程
 )
+
+
+class TimingResult(TypedDict):
+    """Typed timing fields returned by _measure; durations are in nanoseconds."""
+
+    inner_iterations: int
+    wall_time_ns_samples: list[float]
+    process_cpu_time_ns_samples: list[float]
+    min_ns: float
+    median_ns: float
+    p50_ns: float
+    p95_ns: float
+    mean_ns: float
+    process_cpu_median_ns: float
+    coefficient_of_variation: float
 
 
 @dataclass(frozen=True)
@@ -90,7 +105,7 @@ class BenchmarkSettings:
     target_sample_ms: float  # 目标单次采样时长
     operators: tuple[str, ...]  # 本次要跑的算子名称元组
     execution_profile: str | None
-    cpu_affinity: tuple[int, ...] | None
+    cpu_affinity: tuple[int, ...] | None # 允许运行的逻辑 CPU 编号，None 表示不主动绑核
     thread_count: int | None
 
 
@@ -841,7 +856,7 @@ def _measure(
     warmup_iterations: int,
     measured_iterations: int,
     target_sample_ms: float,
-) -> dict[str, object]:
+) -> TimingResult:
     # 预热后对算子进行测量，并针对极小负载做校准。
     """Measure an operator after warmup, with calibration for tiny workloads."""
     for _ in range(warmup_iterations):
